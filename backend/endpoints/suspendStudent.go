@@ -1,9 +1,9 @@
 package endpoints
 
 import (
-	"fmt"
 	"net/http"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,16 +26,18 @@ func SuspendStudent(c* gin.Context) {
 	}
 
 
-	pgxConn, connCtx, err := GetConnection(c)
+	pgxDB, err := GetConnection(c)
 	if err != nil {
 
 	}
 
-	// Update student status to suspended
-	query := fmt.Sprintf("UPDATE public.users SET status=%d where email='%s'", SUSPENDED, request.StudentEmail)
-	_, err = pgxConn.Exec(connCtx, query)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar) // required for psql
+	updateQuery := psql.Update("public.users").Set("status", SUSPENDED).Where(sq.Eq{"email": request.StudentEmail})
+
+	_, sqlErr := updateQuery.RunWith(pgxDB).Exec()
+
+	if sqlErr != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": sqlErr.Error()})
 		return
 	}
 

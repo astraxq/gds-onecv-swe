@@ -1,10 +1,10 @@
 package endpoints
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
+	sq "github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,33 +28,31 @@ func RegisterStudents(c* gin.Context) {
 	}
 
 
-	pgxConn, connCtx, err := GetConnection(c)
+	pgxDB, err := GetConnection(c)
 	if err != nil {
 
 	}
 
 	var teacherId uint64
-	query := fmt.Sprintf("SELECT id from public.users where email='%s'", request.Teacher)
-	err = pgxConn.QueryRow(connCtx, query).Scan(&teacherId)
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar) // required for psql
+	sqQuery := psql.Select("id").From("public.users").Where(sq.Eq{"email": request.Teacher})
+	err = sqQuery.RunWith(pgxDB).QueryRow().Scan(&teacherId)
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var studentIds []uint64
-	students, err := sliceToInClause(request.Students)
-
-	query = fmt.Sprintf("SELECT id from public.users where email in (%s)", students)
-	ids, err := pgxConn.Query(connCtx, query)
-
+	sqQuery = psql.Select("id").From("public.users").Where(sq.Eq{"email": request.Students})
+	rows, err := sqQuery.RunWith(pgxDB).Query()
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	for ids.Next() {
+	for rows.Next() {
 		var uid uint64
-		err := ids.Scan(&uid)
+		err := rows.Scan(&uid)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -63,8 +61,8 @@ func RegisterStudents(c* gin.Context) {
 
 	// create teacher-student relationship (fail silently if already exists)
 	for _, studentId := range studentIds {
-		query = fmt.Sprintf("INSERT INTO public.user_tags (teacher_id, student_id) VALUES (%d, %d) ON CONFLICT DO NOTHING", teacherId, studentId)
-		_, err = pgxConn.Exec(connCtx, query)
+		insertQuery := psql.Insert("public.user_tags").Columns("teacher_id", "student_id").Values(teacherId, studentId).Suffix("ON CONFLICT DO NOTHING")
+		_, err = insertQuery.RunWith(pgxDB).Exec()
 		if err != nil {
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return

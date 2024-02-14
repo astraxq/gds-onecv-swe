@@ -1,12 +1,10 @@
 package endpoints
 
 import (
-	"fmt"
 	"net/http"
 	"regexp"
 
-	"strings"
-
+	sq "github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +14,6 @@ func RetrieveForNotifications(c* gin.Context) {
 		TeacherEmail string `json:"teacher"`
 		Notification string `json:"notification"`
 	}
-	
 
 	// Handle invalid request body
 	if err := c.BindJSON(&request); err != nil {
@@ -31,7 +28,7 @@ func RetrieveForNotifications(c* gin.Context) {
 	}
 
 
-	pgxConn, connCtx, err := GetConnection(c)
+	pgxDB, err := GetConnection(c)
 	if err != nil {
 
 	}
@@ -41,61 +38,54 @@ func RetrieveForNotifications(c* gin.Context) {
 
 	// Get teacher id
 	var teacherId uint64
-	query := fmt.Sprintf("SELECT id from public.users where email='%s'", request.TeacherEmail)
-	err = pgxConn.QueryRow(connCtx, query).Scan(&teacherId)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar) // required for psql
+	sqQuery := psql.Select("id").From("public.users").Where(sq.Eq{"email": request.TeacherEmail})
+	
+	sqlErr := sqQuery.RunWith(pgxDB).QueryRow().Scan(&teacherId)
+	if sqlErr != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": sqlErr.Error()})
 		return
 	}
 
 	// Get students id registered with teacher id
-	var idSlice []uint64
-	query = fmt.Sprintf("SELECT student_id from public.user_tags where teacher_id=%d", teacherId)
-	studentIds, err := pgxConn.Query(connCtx, query)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var studentIDs []uint64
+	sqQuery = psql.Select("student_id").From("public.user_tags").Where(sq.Eq{"teacher_id": teacherId})
+	rows, sqlErr := sqQuery.RunWith(pgxDB).Query()
+	if sqlErr != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": sqlErr.Error()})
 		return
 	}
 
-	for studentIds.Next() {
+	for rows.Next() {
 		var uid uint64
-		err := studentIds.Scan(&uid)
+		err := rows.Scan(&uid)
 		if err != nil {
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		idSlice = append(idSlice, uid)
-	}
-
-	fmt.Println(idSlice)
-
-	// If no students are registered with teacher id, return mentioned students
-	if len(idSlice) == 0 {
-		c.IndentedJSON(http.StatusOK, gin.H{"recipients": mentionedStudents})
-		return
+		studentIDs = append(studentIDs, uid)
 	}
 
 	// Get student emails registered with teacher id and mentioned in notification
 	var students []string
-	idSliceString, err := sliceToInClause(idSlice)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	query = fmt.Sprintf("SELECT email from public.users where id in (%s)", idSliceString)
-	if mentionedStudents != nil {
-		query += fmt.Sprintf(" OR email in ('%s')", strings.Join(mentionedStudents, "','"))
-	}
+	sqQuery = psql.Select("email").From("public.users")
 
-	studentEmails, err := pgxConn.Query(connCtx, query)
-	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if len(studentIDs) == 0 && mentionedStudents != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"recipients": []string{}})
 		return
 	}
 
-	for studentEmails.Next() {
+	sqQuery = sqQuery.Where(sq.Or{sq.Eq{"id": studentIDs}, sq.Eq{"email": mentionedStudents}}).Where(sq.NotEq{"status": SUSPENDED})
+
+	rows, sqlErr = sqQuery.RunWith(pgxDB).Query()
+	if sqlErr != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": sqlErr.Error()})
+		return
+	}
+
+	for rows.Next() {
 		var email string
-		err := studentEmails.Scan(&email)
+		err := rows.Scan(&email)
 		if err != nil {
 			c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
@@ -103,7 +93,7 @@ func RetrieveForNotifications(c* gin.Context) {
 		students = append(students, email)
 	}
 
-	
+
 	c.IndentedJSON(http.StatusOK, gin.H{"recipients": students})
 }
 

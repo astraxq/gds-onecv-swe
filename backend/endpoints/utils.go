@@ -1,54 +1,23 @@
 package endpoints
 
 import (
-	"context"
+	"database/sql"
 	"errors"
-	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v4"
 )
 
-func GetConnection(c* gin.Context) (*pgx.Conn, context.Context, error){
-	var pgxConn *pgx.Conn
-	var connCtx context.Context
+func GetConnection(c* gin.Context) (*sql.DB, error){
+	var pgxDB *sql.DB
 
-	// get conn and context
-	conn, ok := c.Get("databaseConn")
+	db, ok := c.Get("db")
 	if !ok {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: ": "Database connection not found"})
-		return &pgx.Conn{}, nil, errors.New("Database connection not found")
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: ": "Database not found"})
+		return nil, errors.New("Database not found")
 	}
 
-	ctx, ok := c.Get("context")
-	if !ok {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": "Context not found"})
-		return &pgx.Conn{}, nil, errors.New("Context not found")
-	}
+	pgxDB = db.(*sql.DB)
 
-	pgxConn = conn.(*pgx.Conn)
-	connCtx = ctx.(context.Context)
-
-	return pgxConn, connCtx, nil
-}
-
-func sliceToInClause(slice interface{}) (string, error) {
-    switch v := slice.(type) {
-    case []uint64:
-        s := make([]string, len(v))
-        for i, val := range v {
-            s[i] = fmt.Sprint(val)
-        }
-        return strings.Join(s, ","), nil
-    case []string:
-        s := make([]string, len(v))
-        for i, val := range v {
-            s[i] = fmt.Sprintf("'%s'", val)
-        }
-        return strings.Join(s, ","), nil
-    default:
-        return "", fmt.Errorf("unsupported type: %T", slice)
-    }
+	return pgxDB, nil
 }

@@ -1,15 +1,13 @@
 package database
 
 import (
-	"context"
+	"database/sql"
 	"fmt"
 	"log"
-
-	"github.com/jackc/pgx/v4"
 )
 
-func DropTable(conn *pgx.Conn, tableName string) {
-    _, err := conn.Exec(context.Background(), fmt.Sprintf("DROP TABLE IF EXISTS %s;", tableName))
+func DropTable(db *sql.DB, tableName string) {
+    _, err := db.Exec( fmt.Sprintf("DROP TABLE IF EXISTS %s;", tableName))
     if err != nil {
         log.Fatalf("Unable to drop table users: %v\n", err)
     }
@@ -17,12 +15,12 @@ func DropTable(conn *pgx.Conn, tableName string) {
     fmt.Println("Table users dropped successfully")
 }
 
-func SeedUsers(conn *pgx.Conn) {
+func SeedUsers(db *sql.DB) {
     // Drop the table first
-    DropTable(conn, "users")
+    DropTable(db, "users")
 
     // Seed the users table
-    _, err := conn.Exec(context.Background(), `
+    _, err := db.Exec(`
         CREATE TABLE IF NOT EXISTS public.users (
             id SERIAL PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
@@ -40,7 +38,7 @@ func SeedUsers(conn *pgx.Conn) {
     }
 
     // Seed the users table
-    _, err = conn.Exec(context.Background(), `
+    _, err = db.Exec( `
         INSERT INTO public.users (name, email, role, status, notification_allowed)
         VALUES
         ('Ken Doe', 'teacherken@example.com', 2, 1, true),
@@ -54,12 +52,12 @@ func SeedUsers(conn *pgx.Conn) {
     fmt.Println("Data inserted successfully")
 }
 
-func SeedUserTags(conn *pgx.Conn) {
+func SeedUserTags(db *sql.DB) {
     // Drop the table first
-    DropTable(conn, "user_tags")
+    DropTable(db, "user_tags")
 
     // Seed the user tag table
-    _, err := conn.Exec(context.Background(), `
+    _, err := db.Exec(`
         CREATE TABLE IF NOT EXISTS public.user_tags (
             id SERIAL,
             teacher_id INT NOT NULL,
