@@ -1,4 +1,4 @@
-package endpoints
+package controller
 
 import (
 	"log"
@@ -62,6 +62,12 @@ func CommonStudents(c* gin.Context) {
 			log.Fatal(err)
 		}
 		studentIds = append(studentIds, uid)
+	}
+
+	// No common students found
+	if len(studentIds) == 0 {
+		c.IndentedJSON(http.StatusOK, gin.H{"students": []string{}})
+		return
 	}
 
 	// Get student emails by student ids

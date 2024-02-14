@@ -1,20 +1,13 @@
 package main
 
 import (
+	"backend/teacher-admin-api/controller"
 	"backend/teacher-admin-api/database"
-	"backend/teacher-admin-api/endpoints"
 	"database/sql"
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
-
-
-func getStudentsByTeacherID(c* gin.Context) {
-	// get students by teacher id
-	c.IndentedJSON(http.StatusOK, []endpoints.User{})
-}
 
 // ApiMiddleware will add the db connection to the context
 func ApiMiddleware(db *sql.DB) gin.HandlerFunc {
@@ -24,25 +17,31 @@ func ApiMiddleware(db *sql.DB) gin.HandlerFunc {
     }
 }
 
+func SetupRouter(db *sql.DB) *gin.Engine {
+	router := gin.Default()
+	router.Use(ApiMiddleware(db))
+
+	router.POST("/register", controller.RegisterStudents)
+	router.GET("/commonstudents", controller.CommonStudents)
+	router.POST("/suspend", controller.SuspendStudent)
+	router.POST("/retrievefornotifications", controller.RetrieveForNotifications)
+	return router
+}
+
 func main() {
-    db, err := database.ConnectDatabase()
+    db, err := database.Init()
 	if err != nil {
         log.Fatalf("Unable to connect to database: %v\n", err)
     }
 	defer db.Close()
 
+	// Create tables in the database
+	database.Migration(db)
+
     // Seed the users table
     database.SeedUsers(db)
 
-	// Seed the user tag table
-	database.SeedUserTags(db)
 
-	router := gin.Default()
-	router.Use(ApiMiddleware(db))
-	router.POST("/register", endpoints.RegisterStudents)
-	router.GET("/commonstudents", endpoints.CommonStudents)
-	router.POST("/suspend", endpoints.SuspendStudent)
-	router.POST("/retrievefornotifications", endpoints.RetrieveForNotifications)
-
+	router := SetupRouter(db)
 	router.Run("localhost:8080")
 }

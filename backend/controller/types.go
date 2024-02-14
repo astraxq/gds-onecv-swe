@@ -1,4 +1,4 @@
-package endpoints
+package controller
 
 // create enum for status
 type Status int
