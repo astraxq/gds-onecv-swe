@@ -18,14 +18,14 @@ func Init() ( *sql.DB, error) {
       fmt.Println("Error is occurred  on .env file please check")
    }
    //we read our .env file
-   host := os.Getenv("HOST")
-   port := os.Getenv("PORT") 
-   user := os.Getenv("USER")
-//    password := os.Getenv("PASSWORD")
-   dbname := os.Getenv("DB_NAME")
+//    host := os.Getenv("HOST")
+//    port := os.Getenv("PORT") 
+//    user := os.Getenv("POSTGRES_USER")
+//    password := os.Getenv("POSTGRES_PASSWORD")
+//    dbname := os.Getenv("POSTGRES_DB")
 
    // connect to database 
-   connOpts := fmt.Sprintf("postgresql://%s@%s:%s/%s", user, host, port, dbname)
+   connOpts := os.Getenv("DB_SOURCE")
 
    db, err := sql.Open("pgx", connOpts)
    

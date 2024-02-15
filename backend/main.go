@@ -35,13 +35,10 @@ func main() {
     }
 	defer db.Close()
 
-	// Create tables in the database
-	database.Migration(db)
-
     // Seed the users table
     database.SeedUsers(db)
 
 
 	router := SetupRouter(db)
-	router.Run("localhost:8080")
+	router.Run("localhost:8000")
 }
