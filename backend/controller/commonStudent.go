@@ -27,7 +27,7 @@ func CommonStudents(c* gin.Context) {
 
 	// Get teacher ids from emails
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar) // required for psql
-	sqQuery := psql.Select("id").From("users").Where(sq.Eq{"email": teacherEmails})
+	sqQuery := psql.Select("id").From("users").Where(sq.Eq{"email": teacherEmails}, sq.Eq{"role": TEACHER})
 	rows, sqlErr := sqQuery.RunWith(pgxDB).Query()
 
 	if sqlErr != nil {

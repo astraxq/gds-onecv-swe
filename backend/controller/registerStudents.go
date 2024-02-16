@@ -36,7 +36,7 @@ func RegisterStudents(c* gin.Context) {
 	// Get teacher id from email
 	var teacherId uint64
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar) // required for psql
-	sqQuery := psql.Select("id").From("users").Where(sq.Eq{"email": request.Teacher})
+	sqQuery := psql.Select("id").From("users").Where(sq.Eq{"email": request.Teacher}, sq.Eq{"role": TEACHER})
 	err = sqQuery.RunWith(pgxDB).QueryRow().Scan(&teacherId)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to get teacher id": err.Error()})
@@ -44,7 +44,7 @@ func RegisterStudents(c* gin.Context) {
 	}
 
 	// Get student ids from emails
-	sqQuery = psql.Select("id").From("users").Where(sq.Eq{"email": request.Students})
+	sqQuery = psql.Select("id").From("users").Where(sq.Eq{"email": request.Students}, sq.Eq{"role": STUDENT})
 	rows, err := sqQuery.RunWith(pgxDB).Query()
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to get student ids": err.Error()})
