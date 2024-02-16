@@ -25,6 +25,7 @@ func SetupRouter(db *sql.DB) *gin.Engine {
 	router.GET("/commonstudents", controller.CommonStudents)
 	router.POST("/suspend", controller.SuspendStudent)
 	router.POST("/retrievefornotifications", controller.RetrieveForNotifications)
+	router.POST("/seed", controller.Seed)
 	return router
 }
 
@@ -34,9 +35,6 @@ func main() {
         log.Fatalf("Unable to connect to database: %v\n", err)
     }
 	defer db.Close()
-
-    // Seed the users table
-    database.SeedUsers(db)
 
 
 	router := SetupRouter(db)
