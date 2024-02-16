@@ -15,29 +15,30 @@ func SuspendStudent(c* gin.Context) {
 
 	// Handle invalid request body
 	if err := c.BindJSON(&request); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error: invalid json body": err.Error()})
 		return
 	}
 
 	// Handle empty inputs
 	if request.StudentEmail == "" {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "Student email cannot be empty"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "student field cannot be empty"})
 		return
 	}
 
 
 	pgxDB, err := GetConnection(c)
 	if err != nil {
-
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: ": "Database not found"})
+		return
 	}
 
 	psql := sq.StatementBuilder.PlaceholderFormat(sq.Dollar) // required for psql
-	updateQuery := psql.Update("public.users").Set("status", SUSPENDED).Where(sq.Eq{"email": request.StudentEmail})
+	updateQuery := psql.Update("users").Set("status", SUSPENDED).Where(sq.Eq{"email": request.StudentEmail})
 
 	_, sqlErr := updateQuery.RunWith(pgxDB).Exec()
 
 	if sqlErr != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": sqlErr.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to update student status": sqlErr.Error()})
 		return
 	}
 
