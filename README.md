@@ -1,5 +1,9 @@
 # gds-onecv-swe
 
+# Documentation
+
+[Link to Public API](https://dev.brianquek.live)
+
 # Setting Up Your Environment
 
 ### 1. Install Go 1.22
