@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS "users" (
     "email" VARCHAR(255) NOT NULL,
     "role" INT NOT NULL,
     "status" INT NOT NULL,
-    "notification_allowed" BOOLEAN NOT NULL,
     CONSTRAINT "email_unique" UNIQUE ("email")
 );
 

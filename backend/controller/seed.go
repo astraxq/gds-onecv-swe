@@ -33,13 +33,13 @@ func Seed(c* gin.Context) {
 	}
 
 
-	insertQuery := psql.Insert("users").Columns("name", "email", "role", "status", "notification_allowed").
-		Values("Ken Doe", "teacherken@example.com", 2, 1, true).
-		Values("Brian Quek", "brianquek@example.com", 2, 1, true).
-		Values("John Tan", "johntan@example.com", 3, 1, true).
-		Values("Jane Smith", "jane.smith@example.com", 3, 1, true).
-		Values("Alice Johnson", "alice.johnson@example.com", 3, 1, true).
-		Values("James Lee", "james.lee@example.com", 3, 1, false)
+	insertQuery := psql.Insert("users").Columns("name", "email", "role", "status").
+		Values("Ken Doe", "teacherken@example.com", 2, 1).
+		Values("Brian Quek", "brianquek@example.com", 2, 1).
+		Values("John Tan", "johntan@example.com", 3, 1).
+		Values("Jane Smith", "jane.smith@example.com", 3, 1).
+		Values("Alice Johnson", "alice.johnson@example.com", 3, 1).
+		Values("James Lee", "james.lee@example.com", 3, 1)
 
 
 	_, sqlErr = insertQuery.RunWith(pgxDB).Exec()

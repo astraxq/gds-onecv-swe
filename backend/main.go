@@ -1,33 +1,10 @@
 package main
 
 import (
-	"backend/teacher-admin-api/controller"
 	"backend/teacher-admin-api/database"
-	"database/sql"
+	"backend/teacher-admin-api/server"
 	"log"
-
-	"github.com/gin-gonic/gin"
 )
-
-// ApiMiddleware will add the db connection to the context
-func ApiMiddleware(db *sql.DB) gin.HandlerFunc {
-    return func(c *gin.Context) {
-		c.Set("db", db)
-        c.Next()
-    }
-}
-
-func SetupRouter(db *sql.DB) *gin.Engine {
-	router := gin.Default()
-	router.Use(ApiMiddleware(db))
-
-	router.POST("/register", controller.RegisterStudents)
-	router.GET("/commonstudents", controller.CommonStudents)
-	router.POST("/suspend", controller.SuspendStudent)
-	router.POST("/retrievefornotifications", controller.RetrieveForNotifications)
-	router.POST("/seed", controller.Seed)
-	return router
-}
 
 func main() {
     db, err := database.Init()
@@ -36,7 +13,6 @@ func main() {
     }
 	defer db.Close()
 
-
-	router := SetupRouter(db)
+	router := server.SetupRouter(db)
 	router.Run("localhost:8000")
 }

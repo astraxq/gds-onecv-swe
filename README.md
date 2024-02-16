@@ -2,7 +2,11 @@
 
 # Documentation
 
-[Link to Public API](https://dev.brianquek.live)
+The API is publicly availale @https://dev.brianquek.live/api
+
+# ERD Diagram
+
+To be added.
 
 # Setting Up Your Environment
 
@@ -45,10 +49,9 @@ go run .
 ### 6. Feel free to test the endpoints via the Postman Collection or curl
 
 ```sh
-curl --location 'https://dev.brianquek.live/commonstudents?teacher=brianquek%40example.com'
-curl --location 'http://localhost:8000/commonstudents?teacher=brianquek%40example.com'
-
-curl --location 'https://dev.brianquek.live/register' \
+# User Story 1: Register Students API
+# public domain
+curl --location 'https://dev.brianquek.live/api/register' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "teacher": "brianquek@example.com",
@@ -56,28 +59,60 @@ curl --location 'https://dev.brianquek.live/register' \
         "jane.smith@example.com",
         "alice.johnson@example.com"
     ]
-
+}'
+# localhost
+curl --location 'http://localhost:8000/api/register' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "teacher": "brianquek@example.com",
+    "students": [
+        "jane.smith@example.com",
+        "alice.johnson@example.com"
+    ]
 }'
 
-curl --location 'http://localhost:8000/suspend' \
+# User Story 2: Common Students
+# public domain
+curl --location 'https://dev.brianquek.live/api/commonstudents?teacher=brianquek%40example.com'
+# localhost
+curl --location 'http://localhost:8000/api/commonstudents?teacher=brianquek%40example.com'
+
+# User Story 3: Suspend Student
+# public domain
+curl --location 'https://dev.brianquek.live/api/suspend' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "student": "jane.smith@example.com"
+}'
+# localhost
+curl --location 'http://localhost:8000/api/suspend' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "student": "jane.smith@example.com"
 }'
 
-    curl --location 'http://localhost:8000/retrievefornotifications' \
-    --header 'Content-Type: application/json' \
-    --data-raw '{
-        "teacher": "teacherken@example.com",
-        "notification": "Hello students! studentagnes@gmail.com studentmiche@gmail.comwdadw diefneigna@sada.com safwaf safsaf@"
-
-    }'
+# User Story 4: Retrieve Notification
+# public domain
+curl --location 'https://dev.brianquek.live/api/retrievefornotifications' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "teacher": "teacherken@example.com",
+    "notification": "Hello students! studentagnes@gmail.com studentmiche@gmail.comwdadw diefneigna@sada.com safwaf safsaf@"
+}'
+# localhost
+curl --location 'http://localhost:8000/api/retrievefornotifications' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "teacher": "teacherken@example.com",
+    "notification": "Hello students! studentagnes@gmail.com studentmiche@gmail.comwdadw diefneigna@sada.com safwaf safsaf@"
+}'
 ```
 
-### 7. Seed Data (I've created seed endpoint that drops the users & student-teacher table, where we subsequently repopulate the users table as given below)
+### 7. Seed Data (QOL Endpoint)
 
 ```
-curl --location --request POST 'http://localhost:8000/seed'
+# clears the table rows and populate the user table
+curl --location --request POST 'http://localhost:8000/api/seed'
 
 
  id |     name      |           email           | role | status | notification_allowed
