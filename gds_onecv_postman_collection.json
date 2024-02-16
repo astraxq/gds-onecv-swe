@@ -1,0 +1,132 @@
+{
+	"info": {
+		"_postman_id": "23bd629e-89d0-4de7-86df-88af8d329790",
+		"name": "GovTechOneCV",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "21463013"
+	},
+	"item": [
+		{
+			"name": "GetStudentByTeacherID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{devUrl}}/commonstudents?teacher=teacherken%40example.com&teacher=brianquek%40example.com",
+					"host": [
+						"{{devUrl}}"
+					],
+					"path": [
+						"commonstudents"
+					],
+					"query": [
+						{
+							"key": "teacher",
+							"value": "teacherken%40example.com"
+						},
+						{
+							"key": "teacher",
+							"value": "brianquek%40example.com"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RegisterStudents",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"teacher\": \"brianquek@example.com\",\n    \"students\": [\n        \"jane.smith@example.com\",\n        \"alice.johnson@example.com\"\n    ]\n    \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{baseUrl}}/register"
+			},
+			"response": []
+		},
+		{
+			"name": "SuspendStudent",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"student\": \"jane.smith@example.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{baseUrl}}/suspend"
+			},
+			"response": []
+		},
+		{
+			"name": "RetrieveForNotifications",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"teacher\": \"teacherken@example.com\",\n    \"notification\": \"Hello students! studentagnes@gmail.com studentmiche@gmail.comwdadw diefneigna@sada.com safwaf safsaf@\"\n    \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{baseUrl}}/retrievefornotifications"
+			},
+			"response": []
+		},
+		{
+			"name": "SeedData",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "{{baseUrl}}/seed"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8000",
+			"type": "string"
+		},
+		{
+			"key": "devUrl",
+			"value": "https://dev.brianquek.live",
+			"type": "string"
+		}
+	]
+}
