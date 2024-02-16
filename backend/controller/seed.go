@@ -11,7 +11,7 @@ import (
 func Seed(c* gin.Context) {
 	pgxDB, err := GetConnection(c)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: ": "Database not found"})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Database not found"})
 		return
 	}
 
@@ -20,7 +20,7 @@ func Seed(c* gin.Context) {
 	deleteQuery := psql.Delete("users")
 	_, sqlErr := deleteQuery.RunWith(pgxDB).Exec()
 	if sqlErr != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to clear users table":  sqlErr.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to clear users table":  sqlErr.Error()})
 		return
 	}
 
@@ -28,7 +28,7 @@ func Seed(c* gin.Context) {
 	_, sqlErr = deleteQuery.RunWith(pgxDB).Exec()
 
 	if sqlErr != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to clear users tags table": sqlErr.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to clear users tags table": sqlErr.Error()})
 		return
 	}
 
@@ -45,7 +45,7 @@ func Seed(c* gin.Context) {
 	_, sqlErr = insertQuery.RunWith(pgxDB).Exec()
 
 	if sqlErr != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to seed tables": sqlErr.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to seed tables": sqlErr.Error()})
 		return
 	}
 

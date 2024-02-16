@@ -17,20 +17,20 @@ func RetrieveForNotifications(c* gin.Context) {
 
 	// Handle invalid request body
 	if err := c.BindJSON(&request); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error: invalid json body": err.Error()})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message: invalid json body": err.Error()})
 		return
 	}
 
 	// Handle empty inputs
 	if request.TeacherEmail == "" {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "teacher field cannot be empty"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "teacher field cannot be empty"})
 		return
 	}
 
 
 	pgxDB, err := GetConnection(c)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: ": "Database not found"})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: ": "Database not found"})
 		return
 	}
 
@@ -44,7 +44,7 @@ func RetrieveForNotifications(c* gin.Context) {
 	
 	sqlErr := sqQuery.RunWith(pgxDB).QueryRow().Scan(&teacherId)
 	if sqlErr != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to get teacher id": sqlErr.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to get teacher id": sqlErr.Error()})
 		return
 	}
 
@@ -53,7 +53,7 @@ func RetrieveForNotifications(c* gin.Context) {
 	sqQuery = psql.Select("student_id").From("user_tags").Where(sq.Eq{"teacher_id": teacherId})
 	rows, sqlErr := sqQuery.RunWith(pgxDB).Query()
 	if sqlErr != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to get students ids": sqlErr.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to get students ids": sqlErr.Error()})
 		return
 	}
 
@@ -61,7 +61,7 @@ func RetrieveForNotifications(c* gin.Context) {
 		var uid uint64
 		err := rows.Scan(&uid)
 		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to scan student ids": err.Error()})
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to scan student ids": err.Error()})
 			return
 		}
 		studentIDs = append(studentIDs, uid)
@@ -80,7 +80,7 @@ func RetrieveForNotifications(c* gin.Context) {
 
 	rows, sqlErr = sqQuery.RunWith(pgxDB).Query()
 	if sqlErr != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to get students emails": sqlErr.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to get students emails": sqlErr.Error()})
 		return
 	}
 
@@ -89,7 +89,7 @@ func RetrieveForNotifications(c* gin.Context) {
 		var email string
 		err := rows.Scan(&email)
 		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to scan student emails": err.Error()})
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to scan student emails": err.Error()})
 			return
 		}
 		studentEmails = append(studentEmails, email)

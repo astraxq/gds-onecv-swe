@@ -14,14 +14,14 @@ func CommonStudents(c* gin.Context) {
 
 	// Handle invalid params
 	if len(teacherEmails) == 0 {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "teacher field cannot be empty"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "teacher field cannot be empty"})
 		return
 	}
 
 	// Get connection and context
 	pgxDB, err := GetConnection(c)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: ": "Database not found"})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Database not found"})
 		return
 	}
 
@@ -31,7 +31,7 @@ func CommonStudents(c* gin.Context) {
 	rows, sqlErr := sqQuery.RunWith(pgxDB).Query()
 
 	if sqlErr != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to get teachers ids": sqlErr.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to get teachers ids": sqlErr.Error()})
 		return
 	}
 
@@ -40,7 +40,7 @@ func CommonStudents(c* gin.Context) {
 		var uid uint64
 		err := rows.Scan(&uid)
 		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to scan teacher ids": err.Error()})
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to scan teacher ids": err.Error()})
 		}
 		teacherIds = append(teacherIds, uid)
 	}
@@ -51,7 +51,7 @@ func CommonStudents(c* gin.Context) {
 	rows, sqlErr = sqQuery.RunWith(pgxDB).Query()
 
 	if sqlErr != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to get student ids from user_tags table": sqlErr.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to get student ids from user_tags table": sqlErr.Error()})
 		return
 	}
 
@@ -60,7 +60,7 @@ func CommonStudents(c* gin.Context) {
 		var uid uint64
 		err := rows.Scan(&uid)
 		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to scan student ids": err.Error()})
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to scan student ids": err.Error()})
 		}
 		studentIds = append(studentIds, uid)
 	}
@@ -77,7 +77,7 @@ func CommonStudents(c* gin.Context) {
 	rows, sqlErr = sqQuery.RunWith(pgxDB).Query()
 
 	if sqlErr != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to get student emails from id": sqlErr.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to get student emails from id": sqlErr.Error()})
 		return
 	}
 

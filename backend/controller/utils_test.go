@@ -52,7 +52,7 @@ func TestGetConnection(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := GetConnection(tt.args.c)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetConnection() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetConnection() message = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {

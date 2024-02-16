@@ -16,20 +16,20 @@ func RegisterStudents(c* gin.Context) {
 
 	// Handle invalid request body
 	if err := c.BindJSON(&request); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error: invalid json body": err.Error()})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message: invalid json body": err.Error()})
 		return
 	}
 
 	// Handle empty inputs
 	if request.Teacher == "" || len(request.Students) == 0 {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "teacher and students fields cannot be empty"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "teacher and students fields cannot be empty"})
 		return
 	}
 
 
 	pgxDB, err := GetConnection(c)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: ": "Database not found"})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: ": "Database not found"})
 		return
 	}
 
@@ -39,7 +39,7 @@ func RegisterStudents(c* gin.Context) {
 	sqQuery := psql.Select("id").From("users").Where(sq.Eq{"email": request.Teacher})
 	err = sqQuery.RunWith(pgxDB).QueryRow().Scan(&teacherId)
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to get teacher id": err.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to get teacher id": err.Error()})
 		return
 	}
 
@@ -47,7 +47,7 @@ func RegisterStudents(c* gin.Context) {
 	sqQuery = psql.Select("id").From("users").Where(sq.Eq{"email": request.Students})
 	rows, err := sqQuery.RunWith(pgxDB).Query()
 	if err != nil {
-		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to get student ids": err.Error()})
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to get student ids": err.Error()})
 		return
 	}
 
@@ -56,7 +56,7 @@ func RegisterStudents(c* gin.Context) {
 		var uid uint64
 		err := rows.Scan(&uid)
 		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to scan student ids": err.Error()})
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to scan student ids": err.Error()})
 		}
 		studentIds = append(studentIds, uid)
 	}
@@ -66,7 +66,7 @@ func RegisterStudents(c* gin.Context) {
 		insertQuery := psql.Insert("user_tags").Columns("teacher_id", "student_id").Values(teacherId, studentId).Suffix("ON CONFLICT DO NOTHING")
 		_, err = insertQuery.RunWith(pgxDB).Exec()
 		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, gin.H{"error: fail to insert teacher-student tags in user tags": err.Error()})
+			c.IndentedJSON(http.StatusInternalServerError, gin.H{"message: fail to insert teacher-student tags in user tags": err.Error()})
 			return
 		}
 	}
