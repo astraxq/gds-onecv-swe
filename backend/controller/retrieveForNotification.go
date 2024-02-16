@@ -103,5 +103,10 @@ func RetrieveForNotifications(c* gin.Context) {
 func getMentionedStudents(notification string) []string {
 	re := regexp.MustCompile(`\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b`)
 	emails := re.FindAllString(notification, -1)
+
+	if emails == nil {
+		return []string{}
+	}
+
 	return emails
 }

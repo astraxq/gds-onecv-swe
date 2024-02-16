@@ -8,6 +8,10 @@ import (
 )
 
 func GetConnection(c* gin.Context) (*sql.DB, error){
+	if c == nil {
+		return nil, errors.New("gin context not found")
+	}
+
 	var pgxDB *sql.DB
 
 	db, ok := c.Get("db")
