@@ -10,43 +10,46 @@ To be added.
 
 # Setting Up Your Environment
 
-### 1. Install Go 1.22
+### 1. Install Go 1.22 (https://go.dev/doc/install)
 
 ```sh
 brew install go@1.22
 ```
 
-### 2. Migrate Go 4.17.0
+### 2. Install Migrate Go 4.17.0 (https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
 
 ```sh
 brew install migrate-go@4.17.0
 ```
 
-### 3. Navigate to backend folder
+### 3. Ensure docker is installed (https://docs.docker.com/engine/install/)
+
+### 4. Clone the repository and navigate to backend directory
 
 ```sh
-cd backend
+git clone https://github.com/astraxq/gds-onecv-swe.git
+cd gds-onecv-swe/backend
 ```
 
-### 4. Run docker compose
+### 5. Run docker compose
 
 ```sh
 docker-compose up -d
 ```
 
-### 5. Run migration file
+### 6. Run migration file
 
 ```sh
 migrate -path database/migration -database "postgresql://root:secret@localhost:5432/class_db?sslmode=disable" -verbose up
 ```
 
-### 5. Run Go Application
+### 7. Run Go Application
 
 ```sh
 go run .
 ```
 
-### 6. Feel free to test the endpoints via the Postman Collection or curl
+### 8. Feel free to test the endpoints via the Postman Collection or curl
 
 ```sh
 # User Story 1: Register Students API
@@ -108,7 +111,7 @@ curl --location 'http://localhost:8000/api/retrievefornotifications' \
 }'
 ```
 
-### 7. Seed Data (QOL Endpoint)
+### Others. Seed Data (QOL Endpoint)
 
 ```
 # clears the table rows and populate the user table
