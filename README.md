@@ -2,7 +2,7 @@
 
 # Documentation
 
-The API is publicly availale @https://dev.brianquek.live/api
+The API is publicly available @https://dev.brianquek.live/api
 
 # ERD Diagram
 
@@ -115,12 +115,12 @@ curl --location 'http://localhost:8000/api/retrievefornotifications' \
 curl --location --request POST 'http://localhost:8000/api/seed'
 
 
- id |     name      |           email           | role | status | notification_allowed
+ id |     name      |           email           | role | status
 ----+---------------+---------------------------+------+--------+----------------------
- 26 | Ken Doe       | teacherken@example.com    |    2 |      1 | t
- 27 | Brian Quek    | brianquek@example.com     |    2 |      1 | t
- 28 | John Tan      | johntan@example.com       |    3 |      1 | t
- 29 | Jane Smith    | jane.smith@example.com    |    3 |      1 | t
- 30 | Alice Johnson | alice.johnson@example.com |    3 |      1 | t
- 31 | James Lee     | james.lee@example.com     |    3 |      1 | f
+ 26 | Ken Doe       | teacherken@example.com    |    2 |      1
+ 27 | Brian Quek    | brianquek@example.com     |    2 |      1
+ 28 | John Tan      | johntan@example.com       |    3 |      1
+ 29 | Jane Smith    | jane.smith@example.com    |    3 |      1
+ 30 | Alice Johnson | alice.johnson@example.com |    3 |      1
+ 31 | James Lee     | james.lee@example.com     |    3 |      1
 ```
