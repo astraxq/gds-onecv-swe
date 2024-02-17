@@ -6,7 +6,7 @@ The API is publicly available @https://dev.brianquek.live/api
 
 # ERD Diagram
 
-To be added.
+ERD Diagram Link @https://drawsql.app/teams/astraxq/diagrams/gds-onecv-swe
 
 # Setting Up Your Environment
 
