@@ -19,7 +19,7 @@ brew install go@1.22
 ### 2. Install Migrate Go 4.17.0 (https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
 
 ```sh
-brew install migrate-go@4.17.0
+brew install golang-migrate@4.17.0
 ```
 
 ### 3. Ensure docker is installed (https://docs.docker.com/engine/install/)
