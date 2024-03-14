@@ -2,7 +2,7 @@
 
 # Documentation
 
-The API is publicly available @https://dev.brianquek.live/api
+The API is publicly available ~@https://dev.brianquek.live/api~
 
 # ERD Diagram
 
